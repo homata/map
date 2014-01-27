@@ -1,0 +1,129 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Toilet Information</title>
+
+  <style type="text/css">
+     html, body{
+        height:  100%;
+        width:   100%;
+        margin:  0;
+        padding: 0;
+      }
+      #ymap{
+         height:  100%;
+         width:   100%;
+      }
+  </style>
+
+  <!-- Yahoo Map API -->
+  <script type="text/javascript"
+      charset="utf-8"
+      src="http://js.api.olp.yahooapis.jp/OpenLocalPlatform/V1/jsapi?appid=dj0zaiZpPWE4bjVUaE1keEJ5NiZkPVlXazlhemN4ZW5ONU16SW1jR285TUEtLSZzPWNvbnN1bWVyc2VjcmV0Jng9ZDc-">
+  </script>
+       
+  <script type="text/javascript">
+  //<![CDATA[
+    const URLXML = "http://www3.city.sabae.fukui.jp/xml/toilet/toiletinformation.xml";
+    const PROXY_SERVER = "http://pf.jig.jp/odp";
+
+    var ymap;  // yahoo map data
+
+    // マップ初期化
+    //window.onload = function() {
+    var map_initialize = function() {
+      var lat = 35.943187; // Sabae Station
+      var lng = 136.188701;
+
+      // Yahoo!地図
+      // http://developer.yahoo.co.jp/webapi/map/openlocalplatform/v1/js/
+      // http://www.hanemaru.com/itemcolumn/11yolp001.html
+      // http://fukuno.jig.jp/2013/datacitysabae
+      // http://fukuno.jig.jp/2012/wcsabaeosm
+	  ymap = new Y.Map("ymap", {
+        configure: {
+		  doubleClickZoom : true,   // ダブルクリックで地図のズームインを有効にします。
+		  scrollWheelZoom : true,   // マウスのスクロールホイールによるズーム処理を有効にします。
+          //singleClickPan : true,  // シングルクリックで地図を移動します。
+		  continuousZoom: true,     // ズーム時に、滑らかなアニメーション処理を有効にします。
+          hybridPhoto: true,        // 航空写真レイヤーセットを写真と注記のハイブリッド表示とします。
+          enableOpenStreetMap: true // OpenStreetMapレイヤーセットが選択できるよう有効にします。
+        }});
+      ymap.addControl(new Y.LayerSetControl());  // 地図のレイヤセットを切り替えるためのボタンを表示します
+      ymap.addControl(new Y.ScaleControl());     // 地図上の距離の目安となるスケールバーを表示します
+	  //ymap.addControl(new Y.ZoomControl());    // 地図の縮尺を変更するためのシンプルなボタンを表示します
+      //ymap.addControl(new Y.SliderZoomControlHorizontal());  // 地図の縮尺を変更するための横長スライダー形式のユーザーインターフェースを表示します
+	  ymap.addControl(new Y.SliderZoomControlVertical());  // 地図の縮尺を変更するための縦長スライダー形式のユーザーインターフェースを表示します
+      //ymap.addControl(new Y.SearchControl()); // 地図検索のユーザーインターフェースを表示します (ZoomControlVerticalとかぶる)
+
+      ymap.drawMap(new Y.LatLng(lat, lng), 15, Y.LayerSetId.NORMAL);  // 標準地図
+	  //ymap.drawMap(new Y.LatLng(lat, lng), 15, Y.LayerSetId.OSM);   // OpenStreetMap
+
+      //ymap.addFeature(new Y.Marker(new Y.LatLng(lat,lng), {title: "鯖江駅"}));  // アイコンを表示
+
+      // マップをクリック
+      ymap.bind('click', function(latlng) {
+        ymap.openInfoWindow(latlng, "You clicked the map at " + latlng.toString());
+        //alert(latlng.toString());
+      });
+     }
+
+      // マーカ追加
+      var map_add_marker = function(jsondata) {
+          var data = jsondata.dataroot.toiletinformation;
+          var length = data.length;
+          //console.log("data length = " + length);
+
+          for (var ii=0; ii<data.length; ii++) {
+              var d0 = data[ii];
+
+              //console.log("--------<< " + ii + " >>--------");
+              //console.log("no        = " + d0.no);
+              //console.log("name      = " + d0.name);
+              //console.log("localname = " + d0.localname);
+              //console.log("latitude  = " + d0.latitude);
+              //console.log("longitude = " + d0.longitude);
+
+              ymap.addFeature(new Y.Marker(new Y.LatLng(d0.latitude,d0.longitude), {title: d0.localname}));  // アイコンを表示
+           }
+      };
+
+      // JSONPをCallback関数
+      var jsonp_callback = function(rootdata) {
+          //console.log("jsonp_callback()");
+          //console.log(rootdata);
+
+          // JSON文字列をオブジェクトに変換
+          json_object = JSON.parse(rootdata);
+          map_add_marker(json_object);
+      };
+
+      // JSONPを実行する関数
+      var jsonp_call = function(url) {
+          //console.log("jsonp_call(0): url=" + url);
+          url = encodeURIComponent(url);
+          fullurl = PROXY_SERVER + "?url=" + url + "&callback=jsonp_callback";
+
+          var head = document.getElementsByTagName("head")[0];
+          var script = document.createElement("script");
+          script.setAttribute("charset","utf-8");
+          script.setAttribute("src", fullurl);
+          script.setAttribute("type", "text/javascript");
+          script.setAttribute("id", 'jsonp');
+          head.appendChild(script);
+      };
+
+      // 初期化関数
+      var initialize = function () {
+         map_initialize();
+         jsonp_call(URLXML);
+      };
+  //]]>
+  </script>   
+</head>
+    
+<body onload="initialize()">
+    <div id="ymap"></div>
+</body>
+</html>

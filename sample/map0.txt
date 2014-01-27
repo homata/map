@@ -1,0 +1,40 @@
+http://map.ultra-zone.net/g/36.518186/138.232835/5
+
+<!DOCTYPE html>
+<html>
+<head>
+        <title>全画面地図</title>
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+        <meta name="keywords" content="Googleマップ,Yahoo!ロコ,Bing地図,全画面,フルスクリーン">
+        <meta name="description" content="地図を画面全体に表示します。Googleマップ、Yahoo!地図、Bing地図をワンクリックで切り替えられます。" />
+        <meta charset=UTF-8><meta property="fb:page_id" content="356084921095029" />
+        <link href="https://plus.google.com/116996705504140100320/" rel="publisher" />
+        <link href="//map.ultra-zone.net/css/121105.css?121107" rel="stylesheet">
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?sensor=true&language=ja&region=JP&key=AIzaSyAhPzJ1rOtc5DofIsMCSV6A26SOGLHNCcw"></script>
+        <script src="//js.api.olp.yahooapis.jp/OpenLocalPlatform/V1/jsapi?appid=ultrazone"></script>
+        <script src="//ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0&mkt=ja-JP"></script>
+        <script src="//map.ultra-zone.net/js/121105.js?130426"></script>
+
+<script>
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-4631057-7']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+<body>
+        <h1>全画面地図</h1>
+        <p>地図を画面全体に表示します。Googleマップ、Yahoo!地図、Bing地図をワンクリックで切り替えられます。</p>
+        <noscript>JavaScriptを有効にしてください。</noscript>
+<div id="map"></div>
+
+<div id="formbase"><div id="header"><input type="text" id="q"><ul id="tc"><li><button id="tcg" onclick="serviceChange('g');" title="Googleマップに切り替える"></button></li><li><button id="tcy" onclick="serviceChange('y');" title="Yahoo!地図に切り替える"></button></li><li><button id="tcb" onclick="serviceChange('b');" title="Bing地図に切り替える"></button></li></ul><ul id="ctrl"><li><button id="rfs"   onclick="fullScreenStart();" title="フルスクリーン表示"></button></li><li><button id="cfs"   onclick="fullScreenEnd();" title="ウィンドウ表示"></button></li><li><button id="plus"  onclick="formSizeExp();" title="詳細表示"></button></li><li><button id="minus" onclick="formSizeRed();" title="簡易表示"></button></li><li><button id="close" onclick="formClose();" title="閉じる"></button></li></ul></div><div id="datail"><ul id="searchres"></ul><input type="text" id="formatted_address" onclick="this.select()"><input type="text" id="mapurl" onclick="this.select()"><div id="opt"><label id="opt-cmark-label"><input type="checkbox" id="opt-cmark"> 中心マーク</label><label id="opt-g-trafficLayer-label"><input type="checkbox" id="opt-g-trafficLayer"> 交通状況</label><label id="opt-g-transitLayer-label"><input type="checkbox" id="opt-g-transitLayer"> 鉄道路線図</label><a href="http://map.ultra-zone.net/" style="display:block;float:right">全画面地図</a></div><div id="adv"></div></div></div><div id="popup"><a class="close" href="javascript:popupClose();">×</a><iframe src="//www.facebook.com/plugins/likebox.php?href=https%3A%2F%2Fwww.facebook.com%2Ffullscreenmap&amp;width=468&amp;height=62&amp;colorscheme=light&amp;show_faces=false&amp;border_color=%23ffffff&amp;stream=false&amp;header=false&amp;appId=230536463715979" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:468px; height:62px;" allowTransparency="true"></iframe></div><div id="cmark" onmousedown="return false;"></div></body></html>

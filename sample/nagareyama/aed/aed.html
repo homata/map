@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>流山市のAED設置場所</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link href="./css/bootstrap.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 45px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+	  img {  
+		max-width: 100%;  
+		height: auto;  
+	  }  
+	  iframe {  
+		max-width: 100%;  
+		height: auto;  
+	  } 
+	  #map-canvas { margin: 0px; padding: 0px }
+	  #map-canvas label { width: auto; display:inline; }
+	  #map-canvas img { max-width: none; }
+
+    </style>
+    <link href="./css/bootstrap-responsive.css" rel="stylesheet">
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../assets/js/html5shiv.js"></script>
+    <![endif]-->
+
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=geometry&region=JP"></script>
+    <script>
+	var map;
+	var centerFlag = null;
+	var infoWindow = null;
+	var markers;
+	
+	var defaultCenter = new google.maps.LatLng(35.8563097, 139.9026602);
+	var defaultZoom = 14;
+	
+	function getGeolocation() {
+		navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+	}
+	
+	function successCallback(position) {		
+		var myCenter = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+		
+		map.setCenter(myCenter);
+		map.setZoom(defaultZoom);
+		setTargetPosition(myCenter);
+	}
+	
+	function errorCallback(error) {
+		alert("位置情報は利用できませんでした");
+	}
+	
+	function initializeForS(pos_self, pos_aed, title_aed, dist) {
+
+	  //var navObj = document.getElementById('idNavibar');
+	  //var navObj_parent = navObj.parentNode;
+	  //navObj_parent.removeChild(navObj);
+	  var mapdiv = document.getElementById('map-canvas');
+	  mapdiv.style.padding = '0px';
+	  mapdiv.style.paddingTop = '0px';
+	  mapdiv.style.margin = '0px';
+	  mapdiv.style.width = '100%';
+	  mapdiv.style.height = '300px';
+	  var mesObj = document.getElementById('idNavibar');
+	  mesObj.innerHTML = title_aed + "(" + Math.round(dist) + "m) が最も近くです。<br /><a href='/'>再読み込み</a>";
+	  var mapOptions = {
+		zoom: defaultZoom + 2,
+		center: pos_self,
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	  };
+	  map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+	  var markerOpts = {
+		position: pos_aed,
+		map: map,
+		title: title_aed
+	  };
+	  new google.maps.Marker(markerOpts);
+	  
+	  var iconUrl = "http://maps.google.co.jp/mapfiles/ms/icons/blue-pushpin.png";
+	  markerOpts = {
+		position: pos_self,
+		map: map,
+		icon: iconUrl,
+		title: "[現在位置]"
+	  };
+	  new google.maps.Marker(markerOpts);
+	  
+	  var patharray = new Array();
+	  patharray[0] = pos_self;
+      patharray[1] = pos_aed;
+
+      // Polylineの初期設定
+      var polylineOpts = {
+        map: map,
+        path: patharray
+      };
+      // 直前で作成したPolylineOptionsを利用してPolylineを作成
+      var polyline = new google.maps.Polyline(polylineOpts);
+	}
+	
+	function successCallbackS(position) {
+		var list_aed = getAEDDefinition();
+		var _c = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+		var memo_dist = -1;
+		var memo_near_pos = null;
+		var memo_near_title = null;
+		
+		for (var aed in list_aed) {
+			var _t = new google.maps.LatLng(list_aed[aed][1], list_aed[aed][2]);
+			var _dist = google.maps.geometry.spherical.computeDistanceBetween(_c, _t);
+			if (memo_dist < 0 || _dist < memo_dist) {
+				memo_dist = _dist;
+				memo_near_pos = _t;
+				memo_near_title = list_aed[aed][0];
+			}
+		}
+		
+		initializeForS(_c, memo_near_pos, memo_near_title, memo_dist);
+	}
+	
+	function errorCallbackS(error) {
+		alert("位置情報は利用できませんでした（スマートフォンでは位置情報がないとご利用になれません）");
+	}	
+	
+	function returnHome() {
+		map.setCenter(defaultCenter);
+		map.setZoom(defaultZoom);
+	}
+	
+	function searchNearAED() {
+		
+		var iconUrl = "http://maps.google.co.jp/mapfiles/ms/icons/red-dot.png";
+		var iconUrl2 = "http://maps.google.co.jp/mapfiles/ms/icons/green-dot.png";
+		
+		var _c = centerFlag.getPosition();
+		
+		var nearAED = null;
+		var dist_memo = -1;
+		
+		for (var aed in markers) {
+			var _t = markers[aed].getPosition();
+			var _dist = google.maps.geometry.spherical.computeDistanceBetween(_c, _t);
+			if (dist_memo < 0 || dist_memo > _dist) {
+				dist_memo = _dist;
+				nearAED = markers[aed];
+			}
+			markers[aed].setIcon(iconUrl);
+		}
+		
+		nearAED.setIcon(iconUrl2);
+		
+		if (infoWindow) {
+			infoWindow.close();
+		}
+		var infoWindowOpts = {
+		    position: nearAED.getPosition(),
+			pixelOffset: new google.maps.Size(0, -35),
+			content: nearAED.getTitle() + "<br />" + Math.round(dist_memo) + " m"
+		};
+		infoWindow = new google.maps.InfoWindow(infoWindowOpts);
+		infoWindow.open(map);
+	}
+	
+	function clickEventFunc(event) {
+		setTargetPosition(event.latLng);
+	}
+	function setTargetPosition(latln) {
+		
+		if (centerFlag) {
+			centerFlag.setMap(null);
+		}
+		
+		
+		var iconUrl = "http://maps.google.co.jp/mapfiles/ms/icons/blue-pushpin.png";
+		var iconShadowUrl = "http://maps.google.co.jp/mapfiles/ms/icons/pushpin_shadow.png";
+		
+		var mopts = {
+		  position: latln,
+		  icon: iconUrl,
+		  shadow: iconShadowUrl,
+		  map: map,
+		  animation: google.maps.Animation.DROP,
+		  title: '[設定位置]'
+		}; 
+     	centerFlag = new google.maps.Marker(mopts);
+		
+		searchNearAED();
+    }
+
+	function getAEDDefinition() {
+		return new Array(
+		  new Array("流山市消防本部・中央消防署",35.8660916,139.9030043),
+		  new Array("東消防署",35.8466701,139.9339132),
+		  new Array("南消防署",35.8388373,139.9009831),
+		  new Array("北消防署",35.8985858,139.9022423),
+		  new Array("東部出張所",35.8433072,139.9428403),
+		  new Array("江戸川台駅前出張所",35.8976138,139.9107444),
+		  new Array("おおたかの森出張所",35.8706965,139.9261438),
+		  new Array("第1コミュニティホーム",35.8605509,139.9260219),
+		  new Array("第2コミュニティホーム",35.8602208,139.9368792),
+		  new Array("第3コミュニティホーム",35.8543323,139.9245028),
+		  new Array("駒木台福祉会館",35.8920681,139.9330367),
+		  new Array("流山福祉会館",35.8554154,139.8988578),
+		  new Array("江戸川台福祉会館",35.898883,139.9136218),
+		  new Array("西深井福祉会館",35.9094174,139.8993587),
+		  new Array("思井福祉会館",35.8461806,139.9127791),
+		  new Array("向小金福祉会館",35.8378945,139.9462902),
+		  new Array("東深井福祉会館",35.912531,139.9135878),
+		  new Array("南福祉会館",35.8829636,139.9038676),
+		  new Array("十太夫福祉会館",35.8760569,139.9317542),
+		  new Array("名都借福祉会館",35.8443015,139.9427486),
+		  new Array("南流山福祉会館",35.8388429,139.9017914),
+		  new Array("野々下福祉会館",35.8587182,139.9357822),
+		  new Array("赤城福祉会館",35.8475749,139.8974859),
+		  new Array("平和台福祉会館",35.8548182,139.9094124),
+		  new Array("下花輪福祉会館（ほっとプラザ） ",35.8749373,139.9007654),
+		  new Array("老人福祉センター",35.9114173,139.9160377),
+		  new Array("流山市ケアセンター",35.8548571,139.9032102),
+		  new Array("北部地域包括支援センター",35.8994245,139.9117331),
+		  new Array("中野久木保育所",35.8950726,139.9000454),
+		  new Array("平和台保育所",35.854035,139.9038907),
+		  new Array("江戸川台保育所",35.9000467,139.9127552),
+		  new Array("向小金保育所",35.8395139,139.9506147),
+		  new Array("東深井保育所",35.9093342,139.9088912),
+		  new Array("江戸川台学童クラブ",35.8996856,139.9122108),
+		  new Array("ちびっこクラブ",35.8605757,139.9038794),
+		  new Array("たけの子ルーム",35.8383554,139.9443848),
+		  new Array("ひよどり学童クラブ",35.8618676,139.9322574),
+		  new Array("山びこルーム（八木北小学校区学童クラブ）",35.8854524,139.9302401),
+		  new Array("あすなろ学童クラブ",35.8346434,139.8988807),
+		  new Array("もりのいえ学童クラブ",35.9086065,139.908994),
+		  new Array("おおぞら学童",35.8519215,139.9005189),
+		  new Array("ひまわり学童クラブ",35.8393261,139.9087241),
+		  new Array("あずま学童クラブ",35.8418797,139.9422904),
+		  new Array("西初石子どもルーム",35.8789171,139.9105255),
+		  new Array("おおたかの森ルーム",35.8760569,139.9317542),
+		  new Array("たんぽぽ学童クラブ",35.9061735,139.8999255),
+		  new Array("つくしんぼ学童クラブ",35.8957585,139.8997843),
+		  new Array("そよかぜ学童クラブ",35.8507107,139.9242723),
+		  new Array("リサイクルプラザ・プラザ館",35.8757788,139.901032),
+		  new Array("森のまちエコセンター",35.9118978,139.9191262),
+		  new Array("江戸川台幼稚園",35.8996856,139.9122108),
+		  new Array("東小学校 ",35.8429989,139.9423432),
+		  new Array("江戸川台小学校 ",35.9015381,139.9125302),
+		  new Array("小山小学校 ",35.8760569,139.9317542),
+		  new Array("新川小学校",35.8957585,139.8997843),
+		  new Array("長崎小学校 ",35.8596209,139.9361877),
+		  new Array("流山小学校 ",35.852638,139.9001939),
+		  new Array("流山北小学校 ",35.859312,139.9046961),
+		  new Array("西初石小学校 ",35.8789171,139.9105255),
+		  new Array("西深井小学校 ",35.9061735,139.8999255),
+		  new Array("東深井小学校 ",35.9086065,139.908994),
+		  new Array("鰭ヶ崎小学校 ",35.8393261,139.9087241),
+		  new Array("南流山小学校 ",35.8346434,139.8988807),
+		  new Array("向小金小学校 ",35.8362895,139.9517425),
+		  new Array("八木北小学校 ",35.8847442,139.9285736),
+		  new Array("八木南小学校 ",35.8507107,139.9242723),
+		  new Array("東部中学校 ",35.8437014,139.9386518),
+		  new Array("常盤松中学校 ",35.882411,139.922366),
+		  new Array("南部中学校 ",35.8621727,139.9107649),
+		  new Array("西初石中学校 ",35.8798558,139.912167),
+		  new Array("東深井中学校 ",35.9063262,139.9055584),
+		  new Array("北部中学校 ",35.8968028,139.9065392),
+		  new Array("南流山中学校 ",35.8344546,139.9009555),
+		  new Array("八木中学校 ",35.8552712,139.9278358),
+		  new Array("流山市役所（第1庁舎） ",35.8562708,139.9028991),
+		  new Array("流山市役所（第2庁舎）",35.8562708,139.9028991),
+		  new Array("流山市役所（第3庁舎）",35.8562708,139.9028991),
+		  new Array("保健センター",35.8799642,139.9177748),
+		  new Array("流山市平日夜間・休日診療所",35.8799642,139.9177748),
+		  new Array("流山市コミュニティプラザ ",35.8782284,139.9092895),
+		  new Array("生涯学習センター",35.8536073,139.9175284),
+		  new Array("総合体育館",35.8587121,139.9188615),
+		  new Array("中央公民館（文化会館） ",35.8602174,139.9052682),
+		  new Array("北部公民館",35.897736,139.9041949),
+		  new Array("東部公民館 ",35.8420129,139.9413877),
+		  new Array("初石公民館 ",35.8805391,139.9177359),
+		  new Array("南流山センター ",35.8388429,139.9017914),
+		  new Array("一茶双樹記念館",35.8500023,139.8960666),
+		  new Array("杜のアトリエ黎明",35.8501162,139.8954472),
+		  new Array("中央図書館 ",35.8590704,139.9024963),
+		  new Array("北部地域図書館（森の図書館）",35.9115784,139.9172125),
+		  new Array("流山市水道局",35.8727099,139.9184),
+		  new Array("つくばエクスプレス 南流山駅",35.8382568,139.9032552),
+		  new Array("つくばエクスプレス 流山セントラルパーク駅",35.8545655,139.9151953),
+		  new Array("つくばエクスプレス 流山おおたかの森駅",35.8714825,139.9248161),
+		  new Array("東武鉄道　運河駅",35.9144224,139.9057079),
+		  new Array("東武鉄道　江戸川台駅",35.8973444,139.911686),
+		  new Array("東武鉄道　初石駅",35.8838162,139.9171775),
+		  new Array("東武鉄道　流山おおたかの森駅",35.8719824,139.925766),
+		  new Array("JR武蔵野線 南流山駅",35.8388345,139.9041106),
+		  new Array("江戸川台ひまわり幼稚園",35.8912288,139.9017287),
+		  new Array("一の台幼稚園",35.9132698,139.9134045),
+		  new Array("このはな幼稚園",35.8555431,139.8989717),
+		  new Array("平和台幼稚園",35.8528463,139.9058211),
+		  new Array("南流山幼稚園",35.8341852,139.9027581),
+		  new Array("神愛幼稚園",35.8788284,139.9244909),
+		  new Array("八木幼稚園",35.8604123,139.9323908),
+		  new Array("JAとうかつ中央　南流山支店",35.8406037,139.9033329),
+		  new Array("JAとうかつ中央　流山支店",35.8511466,139.9027909),
+		  new Array("JAとうかつ中央　八木支店",35.8609008,139.9241665),
+		  new Array("JAとうかつ中央　十太夫支店",35.8808143,139.9295264),
+		  new Array("JAとうかつ中央　新川支店",35.8951809,139.9013592),
+		  new Array("JAとうかつ中央　運河支店",35.9102646,139.9032472),
+		  new Array("流山おおたかの森S・C",35.8706965,139.9261438),
+		  new Array("イトーヨーカドー流山店",35.8502189,139.8993718),
+		  new Array("初石サンシャインゴルフ",35.8907817,139.9159969),
+		  new Array("メトロ流山店",35.8466778,139.8995636),
+		  new Array("東洋学園大学",35.8432061,139.9163677),
+		  new Array("江戸川大学",35.8773319,139.9386257)
+	  );	
+	}
+	
+	function initialize() {
+	  var useragent = navigator.userAgent;
+	  var mapdiv = document.getElementById("map-canvas");
+	
+	  if (useragent.indexOf('iPhone') != -1 || useragent.indexOf('Android') != -1 ) {
+		  navigator.geolocation.getCurrentPosition(successCallbackS, errorCallbackS);
+		  return;
+	  }
+	  
+	  mapdiv.style.width = '800px';
+	  mapdiv.style.height = '600px';
+	  
+	  var mapOptions = {
+		zoom: defaultZoom,
+		center: defaultCenter,
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	  };
+	  map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+	  
+      var list_aed = getAEDDefinition();
+	  
+	  var iconUrl = "http://maps.google.co.jp/mapfiles/ms/icons/red-dot.png";
+	  var iconShadowUrl = "http://maps.google.co.jp/mapfiles/ms/icons/dot_shadow.png";
+	  
+	  markers = new Array();
+	  for (var aed in list_aed) {
+		  var _l = list_aed[aed];
+		  var _title = _l[0];
+		  var _x = _l[1];
+		  var _y = _l[2];
+		  var markerOpts = {
+			position: new google.maps.LatLng(_x, _y),
+			map: map,
+			icon: iconUrl,
+		    shadow: iconShadowUrl,
+			title: _title
+		  };
+		  markers.push(new google.maps.Marker(markerOpts));
+	  }
+	  
+	  // マウスクリックイベントリスナ
+	  google.maps.event.addListener(map, 'click', clickEventFunc);
+	}
+	
+	
+	// 初期化イベントリスナ
+	google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>
+
+  </head>
+
+  <body>
+
+    <div id="idNavibar" class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="#">流山市のAED設置場所</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="active"><a href="javascript: returnHome()">Home</a></li>
+              <li><a href="javascript: getGeolocation()">現在地</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+ <div id="map-canvas" class="container" style="background-color: gray"></div>
+ <div class="alert-info">　<strong>【使い方】</strong>
+   <ul>
+     <li>流山市オープンデータ「AED設置場所」の情報を表示しています （<a href="http://m.city.nagareyama.chiba.jp/10763/014761.html">http://m.city.nagareyama.chiba.jp/10763/014761.html</a>）</li>
+     <li>地図上でシングルクリックするとその位置が選択され、直線距離で最寄りのAEDを示します。</li>
+     <li>[Home]をクリックすると初期位置に戻ります。[現在地]をクリックすると、現在地が選択されますが、ブラウザやインターネットの設定によりうまくいかないことがあります。 </li>
+     <li>スマートフォンからアクセスすると、最寄りのAEDだけを案内するシンプルモードで動作します。</li>
+   </ul>
+   <p><strong>　【制限事項】</strong></p>
+   <ul>
+     <li>隣市により近いAEDがないか、人間が通行できる道のりでの最短距離、AED設置施設の営業日・営業時間などは考慮されていません。</li>
+   </ul>
+ </div>
+</body>
+  
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+  
+
+</html>

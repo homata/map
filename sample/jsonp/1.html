@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Script</title>
+
+<script>
+//xml2json("http://www3.city.sabae.fukui.jp/xml/aed/aed.xml", "ret");
+
+var jsonp_callback = function(rootdata){
+   console.log("jsonp_callback()");
+   //console.log(rootdata);
+
+   // JSON文字列をオブジェクトに変換
+   rootdata = JSON.parse(rootdata);
+   var data = rootdata.dataroot.toiletinformation;
+
+   var length = data.length;
+   console.log("data length = " + length);
+   for (var ii=0; ii<data.length; ii++) {
+     console.log("--------<< " + ii + " >>--------");
+     var d0 = data[ii];
+
+	 console.log("no        = " + d0.no);
+	 console.log("name      = " + d0.name);
+	 console.log("localname = " + d0.localname);
+	 console.log("latitude  = " + d0.latitude);
+     console.log("longitude = " + d0.longitude);
+   }
+};
+
+// JSONPを実行する関数
+var jsonp_call = function(url) {
+    console.log("jsonp_call()");
+    //url2 = "http://localhost:4567/" + "?url=" + url + "&callback=jsonp_callback";
+    //url2 = "http://49.212.52.108:4567/" + "?url=" + url + "&callback=jsonp_callback";
+    url2 = "http://f0004.jig.jp/odp" + "?url=" + url + "&callback=jsonp_callback";
+
+    var head = document.getElementsByTagName("head")[0]; 
+    var script = document.createElement("script");
+    script.setAttribute("charset","utf-8");
+    script.setAttribute("src", url2);
+    script.setAttribute("type", "text/javascript");
+    script.setAttribute("id", 'jsonp');
+    head.appendChild(script);
+};
+
+//jsonp_call("http://www3.city.sabae.fukui.jp/xml/aed/aed.xml");
+//jsonp_call("http://www3.city.sabae.fukui.jp/xml/toilet/toiletinformation.xml");
+jsonp_call("http%3A%2F%2Fwww3.city.sabae.fukui.jp%2Fxml%2Ftoilet%2Ftoiletinformation.xml");
+
+function initialize() {
+   console.log("initialize()");
+};
+</script>
+</head>
+
+<body onload="initialize()">
+</body>
+</html>

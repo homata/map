@@ -1,0 +1,128 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <style type="text/css">
+<!--
+    html { height: 100% }
+    body { height: 100%; margin: 0px; padding: 0px }
+-->
+     html, body{
+        height:  100%;
+        width:   100%;
+        margin:  0;
+        padding: 0;
+      }
+      #yahoo_map{
+         height:  100%;
+         width:   100%;
+      }
+      #google_map{
+         height:  100%;
+         width:   100%;
+      }
+  </style>
+
+  <!-- Yahoo Map API -->
+<!--
+  <script type="text/javascript"
+      charset="utf-8"
+      src="http://js.api.olp.yahooapis.jp/OpenLocalPlatform/V1/jsapi?appid=dj0zaiZpPWE4bjVUaE1keEJ5NiZkPVlXazlhemN4ZW5ONU16SW1jR285TUEtLSZzPWNvbnN1bWVyc2VjcmV0Jng9ZDc-">
+  </script>
+-->
+
+<!-- -->
+  <script type="text/javascript"
+    src="http://map.yahooapis.jp/MapsService/js/V2/?appid=dj0zaiZpPWE4bjVUaE1keEJ5NiZkPVlXazlhemN4ZW5ONU16SW1jR285TUEtLSZzPWNvbnN1bWVyc2VjcmV0Jng9ZDc-" ></script>
+<!-- -->
+       
+  <!-- Google Map API v3 -->
+　<script src="http://maps.google.com/maps/api/js?v=3&sensor=false"
+  　　type="text/javascript" charset="UTF-8"></script>
+
+  <script type="text/javascript">
+  //<![CDATA[
+    var ymap;
+    var gmap;
+
+    window.onload = function() {
+      var lat = 35.943187; // Sabae Station
+      var lng = 136.188701;
+      var center = "35.943187,136.188701";
+
+      // Yahoo!地図
+      // http://developer.yahoo.co.jp/webapi/map/maps/v2/js/
+      yahoo_map = new YahooMapsCtrl("yahoo_map", center, 3);
+      //yahoo_map.addIcon("icon",center);
+      // http://developer.yahoo.co.jp/webapi/map/openlocalplatform/v1/js/
+      //var id = document.getElementById("yahoo_map");
+
+/*
+      var nodes = document.getElementsByTagName("div");
+      var is = nodes.
+      ymap = new Y.Map(id);
+
+      //ymap = new Y.Map("yahoo_map");
+//console.log("ymap  = " + ymap);
+      ymap.drawMap(new Y.LatLng(lat, lng), 17, Y.LayerSetId.NORMAL);
+
+      var marker = new Y.Marker(new Y.LatLng(lat,lng));
+      ymap.addFeature(marker);
+*/
+
+      // Google Mapで利用する初期設定用の変数
+      var latlng = new google.maps.LatLng(lat, lng);
+      var opts = {
+        zoom: 17,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        center: latlng
+      };
+
+      // getElementById("map")の"map"は、body内の<div id="map">より
+      new google.maps.Map(document.getElementById("google_map"), opts);
+    }
+
+    function changemap() {
+      var sel = document.getElementById("sel");
+      var n = sel.selectedIndex;
+      var value = sel.options[n].value;
+
+      switch (n) {
+      case 0:
+        showid = 'yahoo_map';
+        hideid = 'google_map';
+        break;
+
+      case 1:
+        showid = 'google_map';
+        hideid = 'yahoo_map';
+        break;
+
+      default:
+        return;
+      }
+
+      var show = document.getElementById(showid);
+      var hide = document.getElementById(hideid);
+
+      hide.style.zIndex = "1";
+      show.style.zIndex = "200";
+   }
+  //]]>
+  </script>   
+</head>
+    
+<body>
+  <select id="sel" onChange="changemap()">
+    <option value="yahoo_map" selected>Yahoo!地図</option>
+    <option value="google_map">Google Maps</option>
+  </select>
+
+  <div>
+    <div id="yahoo_map" style="position:absolute; z-index:200"></div>
+    <div id="google_map" style="position:absolute; z-index:1"></div>
+  </div>
+
+</body>
+</html>

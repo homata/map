@@ -1,0 +1,15 @@
+* [leaflet.js 0.5.1](http://leafletjs.com/download.html)
+
+* [Leaflet Quick Start Guide](http://leafletjs.com/examples/quick-start.html)
+* [leafletはじめました](http://d.hatena.ne.jp/monomoti/20111218/1324220882)
+* [Web Mapping with OpenStreetMap and Leaflet](http://www.free-map.org.uk/course/ewt/webmapping.xhtml)
+
+
+トイレマップ
+-------------
+
+* [一日一創 (366日目)](http://fukuno.jig.jp/2012/)
+* [鯖江市トイレマップ](http://citydata.jp/Fukui/Sabae-shi/%E9%AF%96%E6%B1%9F%E5%B8%82%E3%83%88%E3%82%A4%E3%83%AC%E3%83%9E%E3%83%83%E3%83%97/rdf1s146i/toilet_list.html)
+* [鯖江トイレマップ（OpenStreetMap）](http://app.linkdata.org/run/app1s251i)
+
+* [日本のオープンデータの総合ランキング](http://citydata.jp/%E7%A6%8F%E4%BA%95%E7%9C%8C/%E9%AF%96%E6%B1%9F%E5%B8%82)

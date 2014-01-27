@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Toilet Information</title>
+    <link href="./assets/stylesheets/leaflet.css?body=1" media="all" rel="stylesheet" type="text/css" />
+    <link href="./assets/stylesheets/maps.css?body=1" media="all" rel="stylesheet" type="text/css" />
+    <!--[if lte IE 8]>
+      <link href="./assets/stylesheets/leaflet.ie.css?body=1" media="screen" rel="stylesheet" type="text/css" />
+    <![endif]-->
+    <script src="./assets/javascripts/leaflet.js?body=1" type="text/javascript"></script>
+    <script src="./assets/javascripts/maps.js?body=1" type="text/javascript"></script>
+
+  <style>
+     html, body{
+        height:  100%;
+        width:   100%;
+        margin:  0;
+        padding: 0;
+      }
+      #map{
+         height:  100%;
+         width:   100%;
+      }
+  </style>
+
+  <script>
+      //const URLXML = "http://www3.city.sabae.fukui.jp/xml/aed/aed.xml";
+      const URLXML = "http://www3.city.sabae.fukui.jp/xml/toilet/toiletinformation.xml";
+      //const PROXY_SERVER = "http://localhost:4567/";
+      //const PROXY_SERVER = "http://49.212.52.108:18080/";
+      const PROXY_SERVER = "http://f0004.jig.jp:18080/";
+
+
+      var map;  // osm map data
+
+      // マップ初期化
+      var map_initialize = function() {
+          L.Icon.Default.imagePath = "./assets/images";
+          var lat = 35.943187; // Sabae Station
+          var lng = 136.188701;
+          map = L.map('map').setView([lat, lng], 15);
+          var osmUrl = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+          var osmAttrib = "Map data © OpenStreetMap contributors";
+          L.tileLayer(osmUrl, {
+            attribution: osmAttrib,
+            maxZoom: 20,
+          }).addTo(map);
+          //var marker = L.marker([lat, lng]).addTo(map);
+          //marker.bindPopup("鯖江駅");
+
+          var popup = L.popup();
+
+          function onMapClick(e) {
+              popup
+              .setLatLng(e.latlng)
+              .setContent("You clicked the map at " + e.latlng.toString())
+              .openOn(map);
+          }
+          map.on('click', onMapClick);
+      };
+
+      var map_add_marker = function(jsondata) {
+          var data = jsondata.dataroot.toiletinformation;
+          var length = data.length;
+          //console.log("data length = " + length);
+
+          for (var ii=0; ii<data.length; ii++) {
+              var d0 = data[ii];
+
+              //console.log("--------<< " + ii + " >>--------");
+	          //console.log("no        = " + d0.no);
+	          //console.log("name      = " + d0.name);
+	          //console.log("localname = " + d0.localname);
+	          //console.log("latitude  = " + d0.latitude);
+              //console.log("longitude = " + d0.longitude);
+
+              var marker = L.marker([d0.latitude, d0.longitude]).addTo(map);
+              marker.bindPopup(d0.localname);
+           }
+      };
+
+      // JSONPをCallback関数
+      var jsonp_callback = function(rootdata) {
+          //console.log("jsonp_callback()");
+          //console.log(rootdata);
+
+          // JSON文字列をオブジェクトに変換
+          json_object = JSON.parse(rootdata);
+          map_add_marker(json_object);
+      };
+
+      // JSONPを実行する関数
+      var jsonp_call = function(url) {
+          //console.log("jsonp_call()");
+          fullurl = PROXY_SERVER + "?url=" + url + "&callback=jsonp_callback";
+
+          var head = document.getElementsByTagName("head")[0]; 
+          var script = document.createElement("script");
+          script.setAttribute("charset","utf-8");
+          script.setAttribute("src", fullurl);
+          script.setAttribute("type", "text/javascript");
+          script.setAttribute("id", 'jsonp');
+          head.appendChild(script);
+      };
+
+      // 初期化関数
+      var initialize = function () {
+         map_initialize();
+         jsonp_call(URLXML);
+      };
+  </script>
+
+</head>
+ <body onload="initialize()">
+  <!--
+  <h1>Toilet Information</h1>
+  -->
+  <div id='map'></div>
+</body>
+</html>
+

@@ -1,4 +1,6 @@
 00.SAVE
+._*
+.DS_Store
 
 lib-cov
 *.seed

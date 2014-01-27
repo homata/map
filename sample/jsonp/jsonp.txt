@@ -1,0 +1,47 @@
+Sinatra JSONP サーバ
+------------
+* [Sinatora](http://www.sinatrarb.com/intro-jp.html)
+* [WebAPIのダミーサーバをすぐに作る方法](http://qiita.com/items/82aacbe8f0062cb2c825)
+* [Sinatraの自動リロード](http://zakuni.blogspot.jp/2012/07/sinatra.html)
+* [Sinatra Proxy](https://gist.github.com/jkamenik/1151485)
+* [Sinatraでテキストプロキシ](http://caviar.air-nifty.com/note/2012/05/sinatra-671f.html)
+* [Sinatra - 始めよう](http://www.sinatrarb.com/intro-jp.html)
+* [Sinatraが使いやすいので勝手に宣伝してみる](http://d.hatena.ne.jp/tkng/20090701/1246468007)
+
+設定
+--------------
+    gem install sinatra --no-ri --no-rdoc
+    gem install sinatra-contrib --no-ri --no-rdoc
+    gem install sinatra-jsonp  --no-ri --no-rdoc
+
+
+Logging
+-------------
+* [Logging in Sinatra](http://stackoverflow.com/questions/5995854/logging-in-sinatra)
+
+使わない
+-------------
+* [sinatraもつこうてみた](http://blog.livedoor.jp/motoki_8791/archives/50673437.html)
+* [XML解析のNokogir](http://nokogiri.org/)
+
+メモ
+--------------
+* [UrlEncode.net](http://urlencode.net/result.cgi)
+
+##### XML URL 
+#open("http://www3.city.sabae.fukui.jp/xml/toilet/toiletinformation.xml")  
+http%3A%2F%2Fwww3.city.sabae.fukui.jp%2Fxml%2Ftoilet%2Ftoiletinformation.xml  
+
+##### Test URL
+http://localhost:4567/?url=http%3A%2F%2Fwww3.city.sabae.fukui.jp%2Fxml%2Ftoilet%2Ftoiletinformation.xml&callback=aaa  
+
+##### hoge
+
+    if found
+      content_type "text/csv"
+      attachment "text.csv"
+      return data
+    else
+      status 404
+      return "Data Not Found"
+    end

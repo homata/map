@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript"
+            charset="utf-8"
+            src="http://js.api.olp.yahooapis.jp/OpenLocalPlatform/V1/jsapi?appid=dj0zaiZpPWE4bjVUaE1keEJ5NiZkPVlXazlhemN4ZW5ONU16SW1jR285TUEtLSZzPWNvbnN1bWVyc2VjcmV0Jng9ZDc-">
+    </script>
+
+    <script type="text/javascript">
+        function init(){
+            var ymap = new Y.Map("map");
+            ymap.drawMap(new Y.LatLng(35.66572, 139.73100), 17, Y.LayerSetId.NORMAL);
+                    
+            var marker = new Y.Marker(new Y.LatLng(35.66582,139.73110));
+            ymap.addFeature(marker);
+            
+            marker.bind('click', markerClick);      //イベントハンドラの登録
+        }
+        
+        function markerClick(){
+            var ll = this.getLatLng();
+            alert("マーカークリック：" + ll.toString());
+        }
+    </script> 
+</head>
+
+<body onload="init()">
+    <div id="map" style="width:300px; height:300px"></div>
+</body>
+</html>
+

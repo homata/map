@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <style type="text/css">
+<!--
+    html { height: 100% }
+    body { height: 100%; margin: 0px; padding: 0px }
+-->
+     html, body{
+        height:  100%;
+        width:   100%;
+        margin:  0;
+        padding: 0;
+      }
+      #ymap{
+         height:  100%;
+         width:   100%;
+      }
+  </style>
+
+  <!-- Yahoo Map API -->
+  <script type="text/javascript"
+      charset="utf-8"
+      src="http://js.api.olp.yahooapis.jp/OpenLocalPlatform/V1/jsapi?appid=dj0zaiZpPWE4bjVUaE1keEJ5NiZkPVlXazlhemN4ZW5ONU16SW1jR285TUEtLSZzPWNvbnN1bWVyc2VjcmV0Jng9ZDc-">
+  </script>
+       
+  <script type="text/javascript">
+  //<![CDATA[
+    var ymap;
+
+    window.onload = function() {
+      var lat = 35.943187; // Sabae Station
+      var lng = 136.188701;
+      //var center = "35.943187,136.188701";
+
+      // Yahoo!’ÃÏ’¿Þ
+      // http://developer.yahoo.co.jp/webapi/map/openlocalplatform/v1/js/
+      // http://fukuno.jig.jp/2013/datacitysabae
+      // http://fukuno.jig.jp/2012/wcsabaeosm
+	  ymap = new Y.Map("ymap", {
+        configure: {
+		  doubleClickZoom : true,   // ’¥À’¥Ö’¥ë’¥¯’¥ê’¥Ã’¥¯’¤Ç’ÃÏ’¿Þ’¤Î’¥º’¡¼’¥à’¥¤’¥ó’¤ò’Í­’¸ú’¤Ë’¤·’¤Þ’¤¹’¡£
+		  scrollWheelZoom : true,   // ’¥Þ’¥¦’¥¹’¤Î’¥¹’¥¯’¥í’¡¼’¥ë’¥Û’¥¤’¡¼’¥ë’¤Ë’¤è’¤ë’¥º’¡¼’¥à’½è’Íý’¤ò’Í­’¸ú’¤Ë’¤·’¤Þ’¤¹’¡£
+          //singleClickPan : true,  // ’¥·’¥ó’¥°’¥ë’¥¯’¥ê’¥Ã’¥¯’¤Ç’ÃÏ’¿Þ’¤ò’°Ü’Æ°’¤·’¤Þ’¤¹’¡£
+		  continuousZoom: true,     // ’¥º’¡¼’¥à’»þ’¤Ë’¡¢’³ê’¤é’¤«’¤Ê’¥¢’¥Ë’¥á’¡¼’¥·’¥ç’¥ó’½è’Íý’¤ò’Í­’¸ú’¤Ë’¤·’¤Þ’¤¹’¡£
+          hybridPhoto: true,        // ’¹Ò’¶õ’¼Ì’¿¿’¥ì’¥¤’¥ä’¡¼’¥»’¥Ã’¥È’¤ò’¼Ì’¿¿’¤È’Ãí’µ­’¤Î’¥Ï’¥¤’¥Ö’¥ê’¥Ã’¥É’É½’¼¨’¤È’¤·’¤Þ’¤¹’¡£
+          enableOpenStreetMap: true // OpenStreetMap’¥ì’¥¤’¥ä’¡¼’¥»’¥Ã’¥È’¤¬’Áª’Âò’¤Ç’¤­’¤ë’¤è’¤¦’Í­’¸ú’¤Ë’¤·’¤Þ’¤¹’¡£
+        }});
+      ymap.addControl(new Y.LayerSetControl());  // ’ÃÏ’¿Þ’¤Î’¥ì’¥¤’¥ä’¥»’¥Ã’¥È’¤ò’ÀÚ’¤ê’ÂØ’¤¨’¤ë’¤¿’¤á’¤Î’¥Ü’¥¿’¥ó’¤ò’É½’¼¨’¤·’¤Þ’¤¹
+      ymap.addControl(new Y.ScaleControl());     // ’ÃÏ’¿Þ’¾å’¤Î’µ÷’Î¥’¤Î’ÌÜ’°Â’¤È’¤Ê’¤ë’¥¹’¥±’¡¼’¥ë’¥Ð’¡¼’¤ò’É½’¼¨’¤·’¤Þ’¤¹
+	  //ymap.addControl(new Y.ZoomControl());    // ’ÃÏ’¿Þ’¤Î’½Ì’¼Ü’¤ò’ÊÑ’¹¹’¤¹’¤ë’¤¿’¤á’¤Î’¥·’¥ó’¥×’¥ë’¤Ê’¥Ü’¥¿’¥ó’¤ò’É½’¼¨’¤·’¤Þ’¤¹
+      //ymap.addControl(new Y.SliderZoomControlHorizontal());  // ’ÃÏ’¿Þ’¤Î’½Ì’¼Ü’¤ò’ÊÑ’¹¹’¤¹’¤ë’¤¿’¤á’¤Î’²£’Ä¹’¥¹’¥é’¥¤’¥À’¡¼’·Á’¼°’¤Î’¥æ’¡¼’¥¶’¡¼’¥¤’¥ó’¥¿’¡¼’¥Õ’¥§’¡¼’¥¹’¤ò’É½’¼¨’¤·’¤Þ’¤¹
+	  ymap.addControl(new Y.SliderZoomControlVertical());  // ’ÃÏ’¿Þ’¤Î’½Ì’¼Ü’¤ò’ÊÑ’¹¹’¤¹’¤ë’¤¿’¤á’¤Î’½Ä’Ä¹’¥¹’¥é’¥¤’¥À’¡¼’·Á’¼°’¤Î’¥æ’¡¼’¥¶’¡¼’¥¤’¥ó’¥¿’¡¼’¥Õ’¥§’¡¼’¥¹’¤ò’É½’¼¨’¤·’¤Þ’¤¹
+      //ymap.addControl(new Y.SearchControl()); // ’ÃÏ’¿Þ’¸¡’º÷’¤Î’¥æ’¡¼’¥¶’¡¼’¥¤’¥ó’¥¿’¡¼’¥Õ’¥§’¡¼’¥¹’¤ò’É½’¼¨’¤·’¤Þ’¤¹ (ZoomControlVertical’¤È’¤«’¤Ö’¤ë)
+
+      ymap.drawMap(new Y.LatLng(lat, lng), 15, Y.LayerSetId.NORMAL);  // ’É¸’½à’ÃÏ’¿Þ
+	  //ymap.drawMap(new Y.LatLng(lat, lng), 15, Y.LayerSetId.OSM);   // OpenStreetMap
+
+      ymap.addFeature(new Y.Marker(new Y.LatLng(lat,lng)));  // 
+   }
+  //]]>
+  </script>   
+</head>
+    
+<body>
+    <div id="ymap"></div>
+</body>
+</html>

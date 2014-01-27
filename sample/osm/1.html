@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Mapapp</title>
+    <link href="./assets/stylesheets/leaflet.css?body=1" media="all" rel="stylesheet" type="text/css" />
+    <link href="./assets/stylesheets/maps.css?body=1" media="all" rel="stylesheet" type="text/css" />
+    <!--[if lte IE 8]>
+      <link href="./assets/stylesheets/leaflet.ie.css?body=1" media="screen" rel="stylesheet" type="text/css" />
+    <![endif]-->
+    <script src="./assets/javascripts/leaflet.js?body=1" type="text/javascript"></script>
+    <script src="./assets/javascripts/maps.js?body=1" type="text/javascript"></script>
+
+  <style>
+     html, body{
+        height:  100%;
+        width:   100%;
+        margin:  0;
+        padding: 0;
+      }
+      #map{
+         height:  100%;
+         width:   100%;
+      }
+  </style>
+
+  <script>
+    function initialize() {
+      L.Icon.Default.imagePath = "./assets/images";
+      var lat = 35.943187; // Sabae Station
+      var lng = 136.188701;
+      var map = L.map('map').setView([lat, lng], 18);
+      var osmUrl = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+      var osmAttrib = "Map data © OpenStreetMap contributors";
+      L.tileLayer(osmUrl, {
+        attribution: osmAttrib,
+        maxZoom: 20,
+      }).addTo(map);
+      var marker = L.marker([lat, lng]).addTo(map);
+      marker.bindPopup("鯖江駅");
+
+      var popup = L.popup();
+
+      function onMapClick(e) {
+        popup
+         .setLatLng(e.latlng)
+         .setContent("You clicked the map at " + e.latlng.toString())
+         .openOn(map);
+      }
+      map.on('click', onMapClick);
+     }
+  </script>
+
+</head>
+ <body onload="initialize()">
+  <div id='map'></div>
+</body>
+</html>
+

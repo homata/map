@@ -1,0 +1,15 @@
+
+Google公式
+---------------
+
+* [API コンソール](https://code.google.com/apis/console) 
+* [Google Maps API](https://developers.google.com/maps/?hl=ja)
+* [Google Maps JavaScript API v3](https://developers.google.com/maps/documentation/javascript/?hl=ja)
+* [Code Samples](https://developers.google.com/maps/documentation/javascript/examples/?hl=ja)
+* [Google Maps API のライセンス](https://developers.google.com/maps/licensing?hl=ja)
+
+メモ
+---------------
+
+* [Google Maps JavaScript APIプログラミング](http://www.geekpage.jp/web/google-maps-api/)
+* [Google MAPS API keyを取得する](http://www.geekpage.jp/web/google-maps-api/v2/signup.php)
